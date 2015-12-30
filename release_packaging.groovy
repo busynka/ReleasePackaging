@@ -89,8 +89,9 @@ static void zip ( String dir, String source_file, String conf_file  ){
                 list[c] = BranchMap                                                                                       // add a map to a list
                 destFile = dir + t + "\\" +i + ".zip"                                                                     // create the name of the destination file
                 include = "**/" + t + "\\Branches\\" + i + "_v" + "*/" + "**"                                             // concatinate the folder name that needs to be included
-                if ((list[c].project == temp)&&(i == list[c].branch)) {                                                     // check if there is configuration for that branch and that project in the properties file
-                    exclude = exclude + ",**/" + (list[c].exclude).replace(",","/**,**/") + "/" + "**"                                           // add the values that you want to exclude if the previos condition is true   
+                if ((list[c].project == temp)&&(i == list[c].branch)) {                                                   // check if there is configuration for that branch and that project in the properties file
+                    exclude = exclude + ",**/" + (list[c].exclude).replace(",","/**,**/") + "/" + "**"                    // add the values that you want to exclude if the previos condition is true  
+					println exclude
                     //include = include+",**/"+list[c].include+"/"+"**"
                 }
                 ant.zip ( destfile: destFile ) {
