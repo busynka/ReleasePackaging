@@ -1,1 +1,1 @@
-groovy release_packaging.groovy "C:/Users/hvainshtein/" export_qa.zip config.properties
+groovy release_packaging.groovy "C:/Users/hvainshtein/ReleasePackaging/" export_01042016.zip config.properties
