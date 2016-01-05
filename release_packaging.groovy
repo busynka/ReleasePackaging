@@ -76,9 +76,7 @@ static void zip ( String dir, String source_file, String conf_file  ){
     
     
     // loop through unique project names
-    uniqueProjectList.each{t->
-		// create separate directory for each project name
-        new File(t).mkdirs()                                                                                              
+    uniqueProjectList.each{t->                                                                                           
         def project_temp = t - t.substring(t.lastIndexOf('_'), t.length())
 		// loop through unique branch names 
         uniqueBranchList.each{ i-> 
