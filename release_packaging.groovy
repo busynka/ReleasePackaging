@@ -37,22 +37,25 @@ static void zip ( String dir, String source_file, String conf_file  ){
     while (e.hasMoreElements()) {
         ZipEntry entry = e.nextElement()
         def entryName = entry.getName()
-        if (entryName =~ project) {  
-            schedule = entryName.substring(entryName.lastIndexOf(project) + 9, entryName.lastIndexOf(project) + 20)       // parsing to get all the project names
+		// parsing to get all the project names
+        if (entryName =~ project) { 
+			schedule = entryName-project
+            schedule = schedule.substring(0, schedule.indexOf("/"))     					
             if (schedule != -1){
 				ProjectList.add(schedule)
 			}      
         } 
+		// parsing to get all the branch names 
         if (entryName =~ branch) {  
-            schedule = entryName.substring(entryName.lastIndexOf(branch) + 9, entry.name.indexOf("_v") + 11)            	  // parsing to get all the branch names 
+            schedule = entryName.substring(entryName.lastIndexOf(branch) + 9, entry.name.indexOf("_v") + 11)           	  
 			BranchList.add(schedule)         
         }  
     }
-                                                                                                                    
-    def uniqueBranchList = BranchList.unique()                                                                         	  // leave unique branch names
-    def uniqueProjectList = ProjectList.unique()                                                                          // leave unique project names
+    // leave unique branch names                                                                                                                
+    def uniqueBranchList = BranchList.unique()
+	// leave unique project names	
+    def uniqueProjectList = ProjectList.unique()                                                                          
     
-        
     //reading configuration file   
          
     def BranchMap = [:]
@@ -60,37 +63,52 @@ static void zip ( String dir, String source_file, String conf_file  ){
     File conf = new File (conf_path)
     conf.eachLine {line, lineNumber->
         if (lineNumber == 1) {           
-            exclude = line                                                                                                // set the exclude to have common exclude for all the branches
-            exclude_temp = line                                                                                           // store common exclude to reset exclude
+            // set the exclude to have common exclude for all the branches
+			exclude = line
+			// store common exclude to reset exclude	
+            exclude_temp = line                                                                                           
         }
+		// read the rest of the file
         else if (lineNumber > 2) {
-			emptyList.add(Arrays.toString(line.split(delims)))													  	  	  // read the rest of the file
+			emptyList.add(Arrays.toString(line.split(delims)))													  	  	  
 		}                                   
     }
     
     
-    
-    uniqueProjectList.each{t->                                                                                            // loop through unique project names
-        new File(t).mkdirs()                                                                                              // create separate directory for each project name
+    // loop through unique project names
+    uniqueProjectList.each{t->
+		// create separate directory for each project name
+        new File(t).mkdirs()                                                                                              
         def project_temp = t - t.substring(t.lastIndexOf('_'), t.length())
-        uniqueBranchList.each{ i->   																					  // loop through unique branch names 
-			exclude = exclude_temp 																					      // reset exclude to have just common exclude	
+		// loop through unique branch names 
+        uniqueBranchList.each{ i-> 
+			// reset exclude to have just common exclude
+			exclude = exclude_temp 																					      	
 			def branch_temp = i - i.substring (i.indexOf("_v"), i.indexOf("_r") + 3)
-            emptyList.eachWithIndex{ p, c ->                                                                              // parse the list and add it to a map																		  
-                BranchMap.put('project',(p.substring(0, p.indexOf(',')+1).replace(",","")).replace("[",""))               // getting a project name
+			// parse the list and add it to a map
+            emptyList.eachWithIndex{ p, c ->
+				// getting a project name
+                BranchMap.put('project',(p.substring(0, p.indexOf(',')+1).replace(",","")).replace("[",""))               
                 p = p - p.substring(0, p.indexOf(',')+1)
-                BranchMap.branch = (p.substring(0, p.indexOf(',')+1).replace(",","")).replace(" ","")                     // getting a branch name
+				// getting a branch name
+                BranchMap.branch = (p.substring(0, p.indexOf(',')+1).replace(",","")).replace(" ","")                     
                 p = p - p.substring(0, p.indexOf(',')+1)
+				// add a map to a list
                 BranchMap.exclude = (p.substring (p.indexOf(', ')+2,p.indexOf(']')+1)).replace("]","")
-                list[c] = BranchMap                                                                                       // add a map to a list  
-                if ((list[c].project == project_temp)&&(branch_temp == list[c].branch)) {                                 // check if there is configuration for that branch and that project in the properties file
-                    exclude = exclude + ",**/" + (list[c].exclude).replace(",","/**,**/") + "/" + "**"                    // add the values that you want to exclude if the previos condition is true  
+                list[c] = BranchMap 
+				// check if there is configuration for that branch and that project in the properties file				
+                if ((list[c].project == project_temp)&&(branch_temp == list[c].branch)) {
+					// add the values that you want to exclude if the previos condition is true 
+                    exclude = exclude + ",**/" + (list[c].exclude).replace(",","/**,**/") + "/" + "**"                     
                 }
 			}
-				include = "**/" + t + "\\Branches\\" + i + "*/" + "**"  											      // concatinate the folder name that needs to be included
-				destFile = dir + t + "\\" + i + "_full.zip" 																	  // create the name of the destination file														
+				// concatinate the folder name that needs to be included
+				include = "**/" + t + "\\Branches\\" + i + "*/" + "**"  											      
+				// create the name of the destination file	
+				destFile = dir + t + "\\" + i + ".zip" 	
+				// create zips				
                 ant.zip ( destfile: destFile ) {
-					zipfileset (src:path, excludes:exclude, includes:include)											  // create zips
+					zipfileset (src:path, excludes:exclude, includes:include)											  
 				}                     									
                                                                                                  
                    
