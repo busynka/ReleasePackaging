@@ -30,7 +30,6 @@ static void zip ( String dir, String source_file, String conf_file  ){
     def ProjectList = []
     def list = []
     def exclude_temp = ""
-    def include_temp = ""
     
     //reading zip file
     
@@ -77,28 +76,27 @@ static void zip ( String dir, String source_file, String conf_file  ){
     uniqueProjectList.each{t->                                                                                            // loop through unique project names
         new File(t).mkdirs()                                                                                              // create separate directory for each project name
         def temp = t - t.substring(t.lastIndexOf('_'), t.length())
-        uniqueBranchList.each{ i->                                                                                        // loop through unique branch names
-            emptyList.eachWithIndex{ p, c ->                                                                              // parse the list and add it to a map
+        uniqueBranchList.each{ i->   																					  // loop through unique branch names 
+			exclude = exclude_temp 																					      // reset exclude to have just common exclude																									  
+            emptyList.eachWithIndex{ p, c ->                                                                              // parse the list and add it to a map																		  
                 BranchMap.put('project',(p.substring(0, p.indexOf(',')+1).replace(",","")).replace("[",""))               // getting a project name
                 p = p - p.substring(0, p.indexOf(',')+1)
                 BranchMap.branch = (p.substring(0, p.indexOf(',')+1).replace(",","")).replace(" ","")                     // getting a branch name
                 p = p - p.substring(0, p.indexOf(',')+1)
-                BranchMap.exclude = (p.substring(0, p.indexOf(',')+1).replace(",","")).replace(" ","")                    // getting the name of the elements to exclude+
-                p = p - p.substring(0, p.indexOf(',')+1)
-                BranchMap.include = (p.substring (p.indexOf(', ')+2,p.indexOf(']')+1).replace(",","")).replace("]","")
-                list[c] = BranchMap                                                                                       // add a map to a list
-                destFile = dir + t + "\\" +i + ".zip"                                                                     // create the name of the destination file
-                include = "**/" + t + "\\Branches\\" + i + "_v" + "*/" + "**"                                             // concatinate the folder name that needs to be included
+                BranchMap.exclude = (p.substring (p.indexOf(', ')+2,p.indexOf(']')+1)).replace("]","")
+                list[c] = BranchMap                                                                                       // add a map to a list                                         
                 if ((list[c].project == temp)&&(i == list[c].branch)) {                                                   // check if there is configuration for that branch and that project in the properties file
                     exclude = exclude + ",**/" + (list[c].exclude).replace(",","/**,**/") + "/" + "**"                    // add the values that you want to exclude if the previos condition is true  
-					println exclude
-                    //include = include+",**/"+list[c].include+"/"+"**"
                 }
+			}
+				include = "**/" + t + "\\Branches\\" + i + "_v" + "*/" + "**"  											  // concatinate the folder name that needs to be included
+				destFile = dir + t + "\\" +i + ".zip" 																	  // create the name of the destination file														
+				//println destFile+" " +include+" "+exclude
                 ant.zip ( destfile: destFile ) {
 					zipfileset (src:path, excludes:exclude, includes:include)											  // create zips
 				}                     									
-                exclude = exclude_temp                                                                                    // reset exclude to have just common exclude
-            }       
+                                                                                                 
+                   
        }              
     }
 }
