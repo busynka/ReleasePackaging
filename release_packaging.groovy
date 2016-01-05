@@ -44,17 +44,14 @@ static void zip ( String dir, String source_file, String conf_file  ){
 			}      
         } 
         if (entryName =~ branch) {  
-            schedule = entryName.substring(entryName.lastIndexOf(branch) + 9, entry.name.indexOf("_v") + 2)            	  // parsing to get all the branch names 
-            if (schedule != -1) {
-                version = entryName.substring (entry.name.indexOf("_v")+ 1, entry.name.indexOf("_r") + 3)
-                BranchList.add(schedule.replace ( "_v", "" ))           
-            }      
+            schedule = entryName.substring(entryName.lastIndexOf(branch) + 9, entry.name.indexOf("_v") + 11)            	  // parsing to get all the branch names 
+			BranchList.add(schedule)         
         }  
     }
                                                                                                                     
     def uniqueBranchList = BranchList.unique()                                                                         	  // leave unique branch names
     def uniqueProjectList = ProjectList.unique()                                                                          // leave unique project names
-        
+    
         
     //reading configuration file   
          
@@ -75,23 +72,23 @@ static void zip ( String dir, String source_file, String conf_file  ){
     
     uniqueProjectList.each{t->                                                                                            // loop through unique project names
         new File(t).mkdirs()                                                                                              // create separate directory for each project name
-        def temp = t - t.substring(t.lastIndexOf('_'), t.length())
+        def project_temp = t - t.substring(t.lastIndexOf('_'), t.length())
         uniqueBranchList.each{ i->   																					  // loop through unique branch names 
-			exclude = exclude_temp 																					      // reset exclude to have just common exclude																									  
+			exclude = exclude_temp 																					      // reset exclude to have just common exclude	
+			def branch_temp = i - i.substring (i.indexOf("_v"), i.indexOf("_r") + 3)
             emptyList.eachWithIndex{ p, c ->                                                                              // parse the list and add it to a map																		  
                 BranchMap.put('project',(p.substring(0, p.indexOf(',')+1).replace(",","")).replace("[",""))               // getting a project name
                 p = p - p.substring(0, p.indexOf(',')+1)
                 BranchMap.branch = (p.substring(0, p.indexOf(',')+1).replace(",","")).replace(" ","")                     // getting a branch name
                 p = p - p.substring(0, p.indexOf(',')+1)
                 BranchMap.exclude = (p.substring (p.indexOf(', ')+2,p.indexOf(']')+1)).replace("]","")
-                list[c] = BranchMap                                                                                       // add a map to a list                                         
-                if ((list[c].project == temp)&&(i == list[c].branch)) {                                                   // check if there is configuration for that branch and that project in the properties file
+                list[c] = BranchMap                                                                                       // add a map to a list  
+                if ((list[c].project == project_temp)&&(branch_temp == list[c].branch)) {                                 // check if there is configuration for that branch and that project in the properties file
                     exclude = exclude + ",**/" + (list[c].exclude).replace(",","/**,**/") + "/" + "**"                    // add the values that you want to exclude if the previos condition is true  
                 }
 			}
-				include = "**/" + t + "\\Branches\\" + i + "_v" + "*/" + "**"  											  // concatinate the folder name that needs to be included
-				destFile = dir + t + "\\" +i + ".zip" 																	  // create the name of the destination file														
-				//println destFile+" " +include+" "+exclude
+				include = "**/" + t + "\\Branches\\" + i + "*/" + "**"  											      // concatinate the folder name that needs to be included
+				destFile = dir + t + "\\" + i + "_full.zip" 																	  // create the name of the destination file														
                 ant.zip ( destfile: destFile ) {
 					zipfileset (src:path, excludes:exclude, includes:include)											  // create zips
 				}                     									
