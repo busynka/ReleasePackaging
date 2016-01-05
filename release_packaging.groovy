@@ -16,7 +16,7 @@ static void main (args){
 static void zip ( String dir, String source_file, String conf_file  ){
     def ant = new AntBuilder()
     def path = dir + source_file
-    def conf_path = dir + conf_file
+    def conf_path = conf_file
     def branch = "Branches/"
     def project = "Projects/" 
     def schedule = ""
@@ -105,7 +105,7 @@ static void zip ( String dir, String source_file, String conf_file  ){
 				// concatinate the folder name that needs to be included
 				include = "**/" + t + "\\Branches\\" + i + "*/" + "**"  											      
 				// create the name of the destination file	
-				destFile = dir + t + "\\" + i + ".zip" 	
+				destFile = dir + t + "\\" + i + "_full.zip" 	
 				// create zips				
                 ant.zip ( destfile: destFile ) {
 					zipfileset (src:path, excludes:exclude, includes:include)											  
