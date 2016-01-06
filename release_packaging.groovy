@@ -22,23 +22,16 @@ static void main (args){
 }
 
 static void zip ( String dir, String source_file, String conf_file  ){
-    def ant = new AntBuilder()
+
     def path = dir + source_file
     def conf_path = conf_file
-    def branch = "Branches/"
-    def project = "Projects/"
-    def exclude = ""
-    def include = ""
-    def destFile = ""
-    def emptyList = []
-    ZipFile file = new ZipFile(path)
-    def BranchList = []
-    def ProjectList = []
-    def list = []
-    def exclude_temp = ""
 
     //reading zip file
-
+    ZipFile file = new ZipFile(path)
+    def branch = "Branches/"
+    def project = "Projects/"
+    def BranchList = []
+    def ProjectList = []
     Enumeration <? extends ZipEntry> e = file.entries()
     while (e.hasMoreElements()) {
         ZipEntry entry = e.nextElement()
@@ -62,9 +55,11 @@ static void zip ( String dir, String source_file, String conf_file  ){
     def uniqueProjectList = ProjectList.unique()
 
     //reading configuration file
-
+    def exclude = ""
+    def exclude_temp = ""
     def BranchMap = [:]
     String delims = "[|]"
+    def emptyList = []
     File conf = new File (conf_path)
     conf.eachLine {line, lineNumber->
         if (lineNumber == 1) {
@@ -81,6 +76,9 @@ static void zip ( String dir, String source_file, String conf_file  ){
 
 
     // loop through unique project names
+    def include = ""
+    def destFile = ""
+    def list = []
     uniqueProjectList.each{t->
         def project_temp = t - t.substring(t.lastIndexOf('_'), t.length())
         // loop through unique branch names
@@ -110,6 +108,7 @@ static void zip ( String dir, String source_file, String conf_file  ){
             // create the name of the destination file
             destFile = dir + t + "\\" + i + "_full.zip"
             // create zips
+            def ant = new AntBuilder()
             ant.zip ( destfile: destFile ) {
                 zipfileset (src:path, excludes:exclude, includes:include)
             }
