@@ -105,7 +105,7 @@ static void zip ( String dir, String source_file, String conf_file  ){
                     exclude = exclude + ",**/" + (list[c].exclude).replace(",","/**,**/") + "/" + "**"
                 }
             }
-            // concatinate the folder name that needs to be included
+            // concatenate the folder name that needs to be included
             include = "**/" + t + "\\Branches\\" + i + "*/" + "**"
             // create the name of the destination file
             destFile = dir + t + "\\" + i + "_full.zip"
