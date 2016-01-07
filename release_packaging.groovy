@@ -27,6 +27,10 @@ static void zip ( String dir, String source_file, String conf_file  ){
     def conf_path = conf_file
 
     //reading zip file
+    /*
+    Going through the zip file structure and getting the list of all the projects and branches,
+    and taking only unique ones
+    */
     ZipFile file = new ZipFile(path)
     def branch = "Branches/"
     def project = "Projects/"
@@ -55,6 +59,12 @@ static void zip ( String dir, String source_file, String conf_file  ){
     def uniqueProjectList = ProjectList.unique()
 
     //reading configuration file
+    /*
+    Going through each line of the configuration file. The 1st line will hold list of objects that we want to
+    exclude in every branch. Starting from the 3rd line the configuration file will be organized the following way:
+    project_name|branch_name|objects
+    Each line will be added to the list.
+    */
     def exclude = ""
     def exclude_temp = ""
     def BranchMap = [:]
@@ -76,6 +86,16 @@ static void zip ( String dir, String source_file, String conf_file  ){
 
 
     // loop through unique project names
+    /*
+    We will be looping through the list of unique project names and through the list of the unique branch names.
+    We will be parsing the list that came from the configuration file and add it the map, and add these maps to the list.
+    After that we will be comparing project name to project name in the configuration file, branch name to the name
+    in the configuration file, and if there is a match, then exclude variable will be updated with the list if the
+    additional objects to exclude. By default exclude holds the objects that will be commonly excluded.
+    Include will be a concatenation of the Project_Name\\Branches\\Branch_Name.
+    Destination file will be a concatenation of destination directory and project name and branch name and _full.
+    exclude, include and destFile will be used for ant.zip for actual zip package creation.
+    */
     def include = ""
     def destFile = ""
     def list = []
