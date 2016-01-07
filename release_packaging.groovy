@@ -26,8 +26,9 @@ static void zip ( String dir, String source_file, String conf_file  ){
     def path = dir + source_file
     def conf_path = conf_file
 
-    //reading zip file
+
     /*
+    reading zip file:
     Going through the zip file structure and getting the list of all the projects and branches,
     and taking only unique ones
     */
@@ -58,8 +59,9 @@ static void zip ( String dir, String source_file, String conf_file  ){
     // leave unique project names
     def uniqueProjectList = ProjectList.unique()
 
-    //reading configuration file
+
     /*
+    reading configuration file:
     Going through each line of the configuration file. The 1st line will hold list of objects that we want to
     exclude in every branch. Starting from the 3rd line the configuration file will be organized the following way:
     project_name|branch_name|objects
@@ -84,9 +86,8 @@ static void zip ( String dir, String source_file, String conf_file  ){
         }
     }
 
-
-    // loop through unique project names
     /*
+    loop through unique project names:
     We will be looping through the list of unique project names and through the list of the unique branch names.
     We will be parsing the list that came from the configuration file and add it the map, and add these maps to the list.
     After that we will be comparing project name to project name in the configuration file, branch name to the name
@@ -132,8 +133,6 @@ static void zip ( String dir, String source_file, String conf_file  ){
             ant.zip ( destfile: destFile ) {
                 zipfileset (src:path, excludes:exclude, includes:include)
             }
-
-
         }
     }
 }
